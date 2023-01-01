@@ -16,7 +16,7 @@ use std::str;
 /// can be configured.
 ///
 /// The internal cursor progresses sequentially from position `0`
-/// (i.e. no bytes has been parsed yet) to maximum position of [`ByteParser::length`]
+/// (i.e. no bytes has been parsed yet) to maximum position of [`BytesParser::length`]
 /// (i.e. all bytes have been parsed).
 ///
 /// If necessary, methods are provided to move the cursor around, with error checking in case the
@@ -45,7 +45,7 @@ macro_rules! build_parse_type_fn {
         #[doc = "Parse a"]
         #[doc=stringify!($parsed_type)]
         #[doc = "and update the internal cursor accordingly.\n\n"]
-        #[doc = "It produces an error if `ByteParser::parseable()` returns an amount inferior to"]
+        #[doc = "It produces an error if `BytesParser::parseable()` returns an amount inferior to"]
         #[doc = "the amount of bytes occupied by a "]
         #[doc=stringify!($parsed_type)]
         #[doc = "."]
@@ -94,7 +94,7 @@ impl<'a> BytesParser<'a> {
 
     /// Parse a [`String`] and update the internal cursor accordingly.
     ///
-    /// It produces an error if `ByteParser::parseable()` returns an amount
+    /// It produces an error if `BytesParser::parseable()` returns an amount
     /// inferior to the given `size`.
     ///
     /// Typically for binary protocols, the string is preceded by an integer representation of

@@ -3,7 +3,7 @@ use thiserror::Error;
 use std::str::Utf8Error;
 
 #[allow(unused_imports)]
-use crate::bytes_parser::BytesParser;
+use crate::parser::BytesParser;
 
 /// All the errors that [BytesParser] can potentially produce.
 #[derive(Error, Debug, Eq, PartialEq)]

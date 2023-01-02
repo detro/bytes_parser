@@ -53,7 +53,7 @@ macro_rules! build_parse_type_fn {
             let size = mem::size_of::<$parsed_type>();
             if self.parseable() < size {
                 return Err(BytesParserError::NotEnoughBytesForTypeError(
-                    stringify!($fn_name).to_string(),
+                    stringify!($parsed_type).to_string(),
                 ));
             }
 

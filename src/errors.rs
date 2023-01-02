@@ -21,8 +21,8 @@ pub enum BytesParserError {
     CursorOutOfBoundError(isize, usize, usize),
 
     /// Failed to parse a UTF-8 [String] from the given bytes.
-    #[error("Failed to parse UTF-8 string")]
-    StringParseError(#[from] Utf8Error),
+    #[error("Failed to parse UTF-8 string: {0}")]
+    StringParseError(#[source] Utf8Error),
 
     /// Failed to parse a [char] from a [u32] worth of bytes (i.e. 4 bytes).
     #[error("Invalid char found in u32")]

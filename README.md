@@ -2,9 +2,8 @@
 
 ## TODOs
 
-* [ ] Negative tests
-* [ ] Package documentation
-* [ ] Examples in package documentation
+* Package documentation
+* Examples in package documentation
 
 ## License
 

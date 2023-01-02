@@ -277,8 +277,9 @@ impl<'a> BytesParser<'a> {
 
 #[cfg(test)]
 mod tests {
+    use std::error::Error;
     use super::BytesParser;
-    use crate::ParsingEndian;
+    use crate::{BytesParserError, ParsingEndian};
 
     #[test]
     fn parse_unsigned_scalars_using_big_endian() {
@@ -481,5 +482,57 @@ mod tests {
         p.set_endian(ParsingEndian::LE);
 
         assert_eq!(p.parse_char_u32().unwrap(), '🦀');
+    }
+
+    #[test]
+    fn try_parse_empty() {
+        let input: &[u8] = &[];
+
+        let mut p = BytesParser::from(input);
+
+        assert_eq!(p.parseable(), 0);
+        assert_eq!(p.is_empty(), true);
+        assert_eq!(p.is_at_start(), p.is_at_end());
+
+
+        assert_eq!(p.parse_u16().unwrap_err(), BytesParserError::NotEnoughBytesForTypeError("u16".to_string()));
+        assert_eq!(p.parse_char_u32().unwrap_err(), BytesParserError::NotEnoughBytesForTypeError("u32".to_string()));
+        assert_eq!(p.parse_str_utf8(10).unwrap_err(), BytesParserError::NotEnoughBytesForStringError(10));
+    }
+
+    #[test]
+    fn try_moving_cursor_out_of_bound() {
+        let input: &[u8] = &[0x00, 0x11, 0x22];
+
+        let mut p = BytesParser::from(input);
+
+        assert_eq!(p.position(), 0);
+        assert_eq!(p.move_at(&3).unwrap_err(), BytesParserError::CursorOutOfBoundError(3, 3, 0));
+        assert_eq!(p.move_at(&33).unwrap_err(), BytesParserError::CursorOutOfBoundError(33, 3, 0));
+
+        assert_eq!(p.move_forward(&1).unwrap(), ());
+        assert_eq!(p.move_forward(&4).unwrap_err(), BytesParserError::CursorOutOfBoundError(5, 3, 1));
+
+        assert_eq!(p.move_backward(&2).unwrap_err(), BytesParserError::CursorOutOfBoundError(-1, 3, 1));
+    }
+
+    #[test]
+    fn try_parsing_char_from_invalid_u32_scalar() {
+        let input: &[u8] = &[0x00, 0x11, 0x22, 0x33];
+
+        let mut p = BytesParser::from(input);
+
+        assert_eq!(p.parse_char_u32().unwrap_err(), BytesParserError::InvalidU32ForCharError);
+    }
+
+    #[test]
+    fn try_parsing_invalid_str() {
+        let input: &[u8] = &[0, 159, 146, 150];
+
+        let mut p = BytesParser::from(input);
+
+        let err = p.parse_str_utf8(4).unwrap_err();
+        assert_eq!(err.to_string(), "Failed to parse UTF-8 string: invalid utf-8 sequence of 1 bytes from index 1");
+        assert_eq!(err.source().unwrap().to_string(), "invalid utf-8 sequence of 1 bytes from index 1");
     }
 }

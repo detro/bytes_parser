@@ -1,7 +1,7 @@
-mod parser;
 mod endianness;
 mod errors;
+mod parser;
 
-pub use self::parser::BytesParser;
 pub use self::endianness::ParsingEndian;
 pub use self::errors::BytesParserError;
+pub use self::parser::BytesParser;

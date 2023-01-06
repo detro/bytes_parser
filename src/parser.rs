@@ -52,9 +52,9 @@ macro_rules! build_parse_type_fn {
         pub fn $fn_name(&mut self) -> Result<$parsed_type, BytesParserError> {
             let size = mem::size_of::<$parsed_type>();
             if self.parseable() < size {
-                return Err(BytesParserError::NotEnoughBytesForTypeError(
-                    stringify!($parsed_type).to_string(),
-                ));
+                return Err(BytesParserError::NotEnoughBytesForTypeError(stringify!(
+                    $parsed_type
+                )));
             }
 
             let start = self.cursor;
@@ -92,7 +92,7 @@ impl<'a> BytesParser<'a> {
     build_parse_type_fn!(parse_f32, f32);
     build_parse_type_fn!(parse_f64, f64);
 
-    /// Parse a [`String`] and update the internal cursor accordingly.
+    /// Parse a [`&str`] and update the internal cursor accordingly.
     ///
     /// It produces an error if `BytesParser::parseable()` returns an amount
     /// inferior to the given `size`.
@@ -103,14 +103,14 @@ impl<'a> BytesParser<'a> {
     ///
     /// # Arguments
     ///
-    /// * `size` - Size of the UTF-8 [`String`] to parse, in bytes. For Arabic characters, this will
+    /// * `size` - Size of the UTF-8 [`&str`] to parse, in bytes. For Arabic characters, this will
     ///   be equivalent to the string length, as UTF-8 uses 1 byte per scalar value.
     ///   But for non-Arabic characters, UTF-8 might requires multiple bytes per scalar value.
     ///   More details can be found in the
     ///   [Rust Programming Language book](https://doc.rust-lang.org/book/ch08-02-strings.html#internal-representation).
     ///   Because of this, determining how many bytes to consume to parse the [`String`] is left
     ///   to the user.
-    pub fn parse_str_utf8(&mut self, size: usize) -> Result<String, BytesParserError> {
+    pub fn parse_str_utf8(&mut self, size: usize) -> Result<&str, BytesParserError> {
         if self.parseable() < size {
             return Err(BytesParserError::NotEnoughBytesForStringError(size));
         }
@@ -122,7 +122,7 @@ impl<'a> BytesParser<'a> {
         match str::from_utf8(slice) {
             Ok(result) => {
                 self.cursor += size;
-                Ok(result.to_string())
+                Ok(result)
             },
             Err(err) => Err(BytesParserError::StringParseError(err)),
         }
@@ -277,9 +277,9 @@ impl<'a> BytesParser<'a> {
 
 #[cfg(test)]
 mod tests {
-    use std::error::Error;
     use super::BytesParser;
     use crate::{BytesParserError, ParsingEndian};
+    use std::error::Error;
 
     #[test]
     fn parse_unsigned_scalars_using_big_endian() {
@@ -494,10 +494,18 @@ mod tests {
         assert_eq!(p.is_empty(), true);
         assert_eq!(p.is_at_start(), p.is_at_end());
 
-
-        assert_eq!(p.parse_u16().unwrap_err(), BytesParserError::NotEnoughBytesForTypeError("u16".to_string()));
-        assert_eq!(p.parse_char_u32().unwrap_err(), BytesParserError::NotEnoughBytesForTypeError("u32".to_string()));
-        assert_eq!(p.parse_str_utf8(10).unwrap_err(), BytesParserError::NotEnoughBytesForStringError(10));
+        assert_eq!(
+            p.parse_u16().unwrap_err(),
+            BytesParserError::NotEnoughBytesForTypeError("u16")
+        );
+        assert_eq!(
+            p.parse_char_u32().unwrap_err(),
+            BytesParserError::NotEnoughBytesForTypeError("u32")
+        );
+        assert_eq!(
+            p.parse_str_utf8(10).unwrap_err(),
+            BytesParserError::NotEnoughBytesForStringError(10)
+        );
     }
 
     #[test]
@@ -507,13 +515,25 @@ mod tests {
         let mut p = BytesParser::from(input);
 
         assert_eq!(p.position(), 0);
-        assert_eq!(p.move_at(&3).unwrap_err(), BytesParserError::CursorOutOfBoundError(3, 3, 0));
-        assert_eq!(p.move_at(&33).unwrap_err(), BytesParserError::CursorOutOfBoundError(33, 3, 0));
+        assert_eq!(
+            p.move_at(&3).unwrap_err(),
+            BytesParserError::CursorOutOfBoundError(3, 3, 0)
+        );
+        assert_eq!(
+            p.move_at(&33).unwrap_err(),
+            BytesParserError::CursorOutOfBoundError(33, 3, 0)
+        );
 
         assert_eq!(p.move_forward(&1).unwrap(), ());
-        assert_eq!(p.move_forward(&4).unwrap_err(), BytesParserError::CursorOutOfBoundError(5, 3, 1));
+        assert_eq!(
+            p.move_forward(&4).unwrap_err(),
+            BytesParserError::CursorOutOfBoundError(5, 3, 1)
+        );
 
-        assert_eq!(p.move_backward(&2).unwrap_err(), BytesParserError::CursorOutOfBoundError(-1, 3, 1));
+        assert_eq!(
+            p.move_backward(&2).unwrap_err(),
+            BytesParserError::CursorOutOfBoundError(-1, 3, 1)
+        );
     }
 
     #[test]
@@ -522,7 +542,10 @@ mod tests {
 
         let mut p = BytesParser::from(input);
 
-        assert_eq!(p.parse_char_u32().unwrap_err(), BytesParserError::InvalidU32ForCharError);
+        assert_eq!(
+            p.parse_char_u32().unwrap_err(),
+            BytesParserError::InvalidU32ForCharError
+        );
     }
 
     #[test]
@@ -532,7 +555,13 @@ mod tests {
         let mut p = BytesParser::from(input);
 
         let err = p.parse_str_utf8(4).unwrap_err();
-        assert_eq!(err.to_string(), "Failed to parse UTF-8 string: invalid utf-8 sequence of 1 bytes from index 1");
-        assert_eq!(err.source().unwrap().to_string(), "invalid utf-8 sequence of 1 bytes from index 1");
+        assert_eq!(
+            err.to_string(),
+            "Failed to parse UTF-8 string: invalid utf-8 sequence of 1 bytes from index 1"
+        );
+        assert_eq!(
+            err.source().unwrap().to_string(),
+            "invalid utf-8 sequence of 1 bytes from index 1"
+        );
     }
 }

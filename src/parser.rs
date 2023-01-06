@@ -52,9 +52,9 @@ macro_rules! build_parse_type_fn {
         pub fn $fn_name(&mut self) -> Result<$parsed_type, BytesParserError> {
             let size = mem::size_of::<$parsed_type>();
             if self.parseable() < size {
-                return Err(BytesParserError::NotEnoughBytesForTypeError(stringify!(
-                    $parsed_type
-                )));
+                return Err(BytesParserError::NotEnoughBytesForTypeError(
+                    stringify!($parsed_type).to_string(),
+                ));
             }
 
             let start = self.cursor;
@@ -496,11 +496,11 @@ mod tests {
 
         assert_eq!(
             p.parse_u16().unwrap_err(),
-            BytesParserError::NotEnoughBytesForTypeError("u16")
+            BytesParserError::NotEnoughBytesForTypeError("u16".to_string())
         );
         assert_eq!(
             p.parse_char_u32().unwrap_err(),
-            BytesParserError::NotEnoughBytesForTypeError("u32")
+            BytesParserError::NotEnoughBytesForTypeError("u32".to_string())
         );
         assert_eq!(
             p.parse_str_utf8(10).unwrap_err(),

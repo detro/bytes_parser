@@ -7,10 +7,10 @@ use crate::parser::BytesParser;
 
 /// All the errors that [BytesParser] can potentially produce.
 #[derive(Error, Debug, Eq, PartialEq)]
-pub enum BytesParserError<'a> {
+pub enum BytesParserError {
     /// Not enough bytes left (i.e. [BytesParser::parseable]) to parse a scalar type from it.
     #[error("Not enough bytes left to parse for {0}")]
-    NotEnoughBytesForTypeError(&'a str),
+    NotEnoughBytesForTypeError(String),
 
     /// Not enough bytes left (i.e. [BytesParser::parseable]) to parse a string of given bytes from it.
     #[error("Not enough bytes left to parse a string of {0} bytes")]

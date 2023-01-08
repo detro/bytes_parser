@@ -16,6 +16,10 @@ pub enum BytesParserError {
     #[error("Not enough bytes left to parse a string of {0} bytes")]
     NotEnoughBytesForStringError(usize),
 
+    /// Not enough bytes left (i.e. [BytesParser::parseable]) to cut a slice of given bytes from it.
+    #[error("Not enough bytes left to cut a slice of size {0}")]
+    NotEnoughBytesForSlice(usize),
+
     /// Position resulting from moving the cursor to or by a given amount, would place the cursor out-of-bound.
     #[error("Moving cursor to/by {0} would place it out-of-bound: bytes array length is {1} and cursor is at {2}")]
     CursorOutOfBoundError(isize, usize, usize),

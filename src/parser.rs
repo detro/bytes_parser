@@ -101,6 +101,10 @@ impl<'a> BytesParser<'a> {
     /// the size of the string in bytes. Unfortunately there is no single standard for how that
     /// integer is encoded (16 bits? 32 bits?), hence the required argument `size`.
     ///
+    /// The data returned is a "view" of the original bytes array, so that should be considered
+    /// when handling the returned reference and its lifetime. If the returned reference has to
+    /// outlast the inner bytes array, it should probably be cloned or turned into a [`String`].
+    ///
     /// # Arguments
     ///
     /// * `size` - Size of the UTF-8 [`&str`] to parse, in bytes. For Arabic characters, this will
@@ -128,7 +132,7 @@ impl<'a> BytesParser<'a> {
         }
     }
 
-    /// Parse a single [`char`] from a [`u32`] (i.e. 4 bytes).
+    /// Parse a single [`char`] from a [`u32`] (i.e. 4 bytes).s
     ///
     /// As per [`char` representation](https://doc.rust-lang.org/1.66.0/std/primitive.char.html#representation),
     /// Rust uses the fixed amount of 4 bytes to encode a single character.
@@ -136,6 +140,46 @@ impl<'a> BytesParser<'a> {
         let u32value = self.parse_u32()?;
         let result = char::from_u32(u32value).ok_or(BytesParserError::InvalidU32ForCharError)?;
         Ok(result)
+    }
+
+    /// "Parse" a slice of bytes `&[u8]` of given `size`, starting from [`Self::position`].
+    ///
+    /// This doesn't actually create anything: it cuts a slice from the inner bytes array,
+    /// that the user can then manipulate in other ways.
+    ///
+    /// The data returned is a "view" of the original bytes array, so that should be considered
+    /// when handling the returned reference and its lifetime. If the returned slice has to
+    /// outlast the inner bytes array, it should probably be cloned.
+    ///
+    /// # Arguments
+    ///
+    /// * `size` - The size of the new slice to cut. The slice will be cut starting from the
+    ///   current position of the internal cursor (i.e. [`Self::position`]).
+    pub fn parse_slice(&mut self, size: usize) -> Result<&[u8], BytesParserError> {
+        if self.parseable() < size {
+            return Err(BytesParserError::NotEnoughBytesForSlice(size));
+        }
+
+        let start = self.cursor;
+        let end = self.cursor + size;
+
+        self.cursor += size;
+
+        Ok(self.buffer[start..end].try_into().unwrap())
+    }
+
+    /// Creates a new [`BytesParser`] that is set to use a slice of bytes as its inner byte array.
+    ///
+    /// This uses [`Self::parse_slice`] to cut a `&[u8]`, and then initializes
+    /// a new [`BytesParser`] using [`Self::from`].
+    ///
+    /// # Arguments
+    ///
+    /// * `size` - The size of the new slice to cut and wrap inside a [`BytesParser`].
+    pub fn from_slice(&mut self, size: usize) -> Result<BytesParser, BytesParserError> {
+        let slice = self.parse_slice(size)?;
+
+        Ok(BytesParser::from(slice))
     }
 
     /// Length of the internal bytes array.
@@ -197,7 +241,7 @@ impl<'a> BytesParser<'a> {
     /// # Arguments
     ///
     /// * `amount` - Amount of bytes to move forward the cursor.
-    pub fn move_forward(&mut self, amount: &usize) -> Result<(), BytesParserError> {
+    pub fn move_forward(&mut self, amount: usize) -> Result<(), BytesParserError> {
         let mut new_cursor = self.cursor;
         new_cursor += amount;
 
@@ -222,9 +266,9 @@ impl<'a> BytesParser<'a> {
     /// # Arguments
     ///
     /// * `amount` - Amount of bytes to move backward the cursor.
-    pub fn move_backward(&mut self, amount: &usize) -> Result<(), BytesParserError> {
+    pub fn move_backward(&mut self, amount: usize) -> Result<(), BytesParserError> {
         let mut new_cursor = self.cursor as isize;
-        new_cursor -= *amount as isize;
+        new_cursor -= amount as isize;
 
         if new_cursor < 0 {
             Err(BytesParserError::CursorOutOfBoundError(
@@ -247,15 +291,15 @@ impl<'a> BytesParser<'a> {
     /// # Arguments
     ///
     /// * `position` - Where to move the cursor at.
-    pub fn move_at(&mut self, position: &usize) -> Result<(), BytesParserError> {
-        if *position >= self.length {
+    pub fn move_at(&mut self, position: usize) -> Result<(), BytesParserError> {
+        if position >= self.length {
             Err(BytesParserError::CursorOutOfBoundError(
-                *position as isize,
+                position as isize,
                 self.length,
                 self.cursor,
             ))
         } else {
-            self.cursor = *position;
+            self.cursor = position;
             Ok(())
         }
     }
@@ -429,20 +473,20 @@ mod tests {
         assert_eq!(p.parse_u8().unwrap(), 0x12);
 
         // Move forward to the last (u128)
-        assert_eq!(p.move_forward(&14), Ok(()));
+        assert_eq!(p.move_forward(14), Ok(()));
         assert_eq!(p.parse_u128().unwrap(), 0x123456789ABCDEF0123456789ABCDEF0);
         assert_eq!(p.position(), 31);
 
         // Move backward to the third scalar value (u32)
-        assert_eq!(p.move_backward(&28), Ok(()));
+        assert_eq!(p.move_backward(28), Ok(()));
         assert_eq!(p.parse_u32().unwrap(), 0x12345678);
 
         // Move to where the last scalar begin (u128)
-        assert_eq!(p.move_at(&15), Ok(()));
+        assert_eq!(p.move_at(15), Ok(()));
         assert_eq!(p.parse_u128().unwrap(), 0x123456789ABCDEF0123456789ABCDEF0);
 
         // Move to where the second scalar begins (u16)
-        assert_eq!(p.move_at(&1), Ok(()));
+        assert_eq!(p.move_at(1), Ok(()));
         assert_eq!(p.parse_u16().unwrap(), 0x1234);
 
         // Move back at the beginning
@@ -455,8 +499,9 @@ mod tests {
     fn parse_string() {
         let input: &[u8] = &[
             0x00, 0x13, //< u16
-            0x46, 0x6F, 0x72, 0x7A, 0x61, 0x20, 0x4E, 0x61, 0x70, 0x6F, 0x6C, 0x69, 0x20, 0x53, 0x65, 0x6D, 0x70, 0x72,
-            0x65,
+            0x46, 0x6F, 0x72, 0x7A, 0x61, 0x20, //< "Forza "
+            0x4E, 0x61, 0x70, 0x6F, 0x6C, 0x69, 0x20, //< "Napoli "
+            0x53, 0x65, 0x6D, 0x70, 0x72, 0x65, //< "Sempre"
         ];
 
         let mut p = BytesParser::from(input);
@@ -482,6 +527,53 @@ mod tests {
         p.set_endian(ParsingEndian::LE);
 
         assert_eq!(p.parse_char_u32().unwrap(), '🦀');
+    }
+
+    #[test]
+    fn parse_slice() {
+        let input: &[u8] = &[
+            0x12, //< u8
+            0x12, 0x34, //< u16
+            0x12, 0x34, 0x56, 0x78, //< u32
+            0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, //< u64
+        ];
+
+        let mut p = BytesParser::from(input);
+
+        assert!(p.move_forward(3).is_ok());
+
+        let input_slice = p.parse_slice(4).unwrap();
+        let mut ps = BytesParser::from(input_slice);
+
+        assert!(ps.is_at_start());
+        assert_eq!(ps.parseable(), 4);
+        assert_eq!(ps.parse_u32().unwrap(), 0x12345678);
+        assert!(ps.is_at_end());
+
+        assert_eq!(p.parse_u32().unwrap(), 0x12345678);
+    }
+
+    #[test]
+    fn from_slice() {
+        let input: &[u8] = &[
+            0x12, //< u8
+            0x12, 0x34, //< u16
+            0x12, 0x34, 0x56, 0x78, //< u32
+            0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, //< u64
+        ];
+
+        let mut p = BytesParser::from(input);
+
+        assert!(p.move_forward(3).is_ok());
+
+        let mut ps = p.from_slice(4).unwrap();
+
+        assert!(ps.is_at_start());
+        assert_eq!(ps.parseable(), 4);
+        assert_eq!(ps.parse_u32().unwrap(), 0x12345678);
+        assert!(ps.is_at_end());
+
+        assert_eq!(p.parse_u32().unwrap(), 0x12345678);
     }
 
     #[test]
@@ -516,22 +608,22 @@ mod tests {
 
         assert_eq!(p.position(), 0);
         assert_eq!(
-            p.move_at(&3).unwrap_err(),
+            p.move_at(3).unwrap_err(),
             BytesParserError::CursorOutOfBoundError(3, 3, 0)
         );
         assert_eq!(
-            p.move_at(&33).unwrap_err(),
+            p.move_at(33).unwrap_err(),
             BytesParserError::CursorOutOfBoundError(33, 3, 0)
         );
 
-        assert_eq!(p.move_forward(&1).unwrap(), ());
+        assert_eq!(p.move_forward(1).unwrap(), ());
         assert_eq!(
-            p.move_forward(&4).unwrap_err(),
+            p.move_forward(4).unwrap_err(),
             BytesParserError::CursorOutOfBoundError(5, 3, 1)
         );
 
         assert_eq!(
-            p.move_backward(&2).unwrap_err(),
+            p.move_backward(2).unwrap_err(),
             BytesParserError::CursorOutOfBoundError(-1, 3, 1)
         );
     }

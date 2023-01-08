@@ -1,5 +1,6 @@
 # Rustlang / Cargo
-/target/
+/target
+/Cargo.lock
 
 # rustfmt
 **/*.rs.bk

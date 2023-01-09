@@ -92,6 +92,9 @@ impl<'a> BytesParser<'a> {
     build_parse_type_fn!(parse_f32, f32);
     build_parse_type_fn!(parse_f64, f64);
 
+    build_parse_type_fn!(parse_isize, isize);
+    build_parse_type_fn!(parse_usize, usize);
+
     /// Parse a [`&str`] and update the internal cursor accordingly.
     ///
     /// It produces an error if `BytesParser::parseable()` returns an amount

@@ -57,7 +57,6 @@ assert_eq!(str, "Forza Napoli Sempre!");
 
 * Publish 0.1
 * Setup GitHub crate publish workflow
-* Setup Dependabot
 
 ## License
 

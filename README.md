@@ -55,7 +55,6 @@ assert_eq!(str, "Forza Napoli Sempre!");
 
 ## TODOs
 
-* Publish 0.1
 * Setup GitHub crate publish workflow
 
 ## License

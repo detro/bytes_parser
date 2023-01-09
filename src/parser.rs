@@ -42,13 +42,13 @@ impl<'a> From<&'a [u8]> for BytesParser<'a> {
 
 macro_rules! build_parse_type_fn {
     ($fn_name:ident, $parsed_type:ty) => {
-        #[doc = "Parse a"]
+        #[doc = "Parse a`"]
         #[doc=stringify!($parsed_type)]
-        #[doc = "and update the internal cursor accordingly.\n\n"]
-        #[doc = "It produces an error if `BytesParser::parseable()` returns an amount inferior to"]
-        #[doc = "the amount of bytes occupied by a "]
+        #[doc = "` and update the internal cursor accordingly.\n\n"]
+        #[doc = "It produces an error if [`BytesParser::parseable`] returns an amount inferior to"]
+        #[doc = "the amount of bytes occupied by a `"]
         #[doc=stringify!($parsed_type)]
-        #[doc = "."]
+        #[doc = "`."]
         pub fn $fn_name(&mut self) -> Result<$parsed_type, BytesParserError> {
             let size = mem::size_of::<$parsed_type>();
             if self.parseable() < size {

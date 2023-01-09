@@ -1,9 +1,11 @@
-# bytes-parser
+# bytes_parser
 
 ## TODOs
 
-* Package documentation
-* Examples in package documentation
+* Finish README, including badges
+* Publish 0.1
+* Setup GitHub crate publish workflow
+* Setup Dependabot
 
 ## License
 

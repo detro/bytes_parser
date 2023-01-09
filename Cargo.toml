@@ -1,10 +1,10 @@
 [package]
-name = "bytes-parser"
+name = "bytes_parser"
 version = "0.1.0"
 edition = "2021"
 authors = ["Ivan De Marino <detronizator@gmail.com>"]
-repository = "https://github.com/detro/bytes-parser"
-homepage = "https://github.com/detro/bytes-parser"
+repository = "https://github.com/detro/bytes_parser"
+homepage = "https://github.com/detro/bytes_parser"
 description = "TODO"
 license = "MIT OR Apache-2.0"
 keywords = ["bytes", "parsing", "encoding", "primitive-types"]

@@ -1,6 +1,6 @@
 # bytes_parser
 
-Library providing a simple wrapper to parse primitive Rust types from a slice of bytes `[u8]`.
+A simple wrapper to parse primitive Rust types from a slice of bytes `[u8]`.
 
 This is the crate for you, if all you need is to parse a **bespoke binary protocol**.
 You provide a reference slice of bytes, and assuming you know what those bytes represent,

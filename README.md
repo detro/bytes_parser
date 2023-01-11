@@ -1,10 +1,10 @@
 # bytes_parser
 
-[![CI](https://img.shields.io/github/actions/workflow/status/detro/bytes_parser/ci.yml?branch=main&label=CI%20%28main%29&logo=Github&style=for-the-badge)](https://github.com/detro/bytes_parser/actions/workflows/ci.yml)
-[![Crates.io downloads](https://img.shields.io/crates/d/bytes_parser?logo=rust&style=for-the-badge)](https://crates.io/crates/bytes_parser)
-[![](https://img.shields.io/crates/v/bytes_parser?label=latest&logo=rust&style=for-the-badge)](https://crates.io/crates/bytes_parser/versions)
-[![Docs.rs](https://img.shields.io/docsrs/bytes_parser?logo=rust&style=for-the-badge)](https://docs.rs/bytes_parser/latest/bytes_parser/)
-![Apache 2.0](https://img.shields.io/crates/l/bytes_parser?style=for-the-badge)
+[![CI](https://img.shields.io/github/actions/workflow/status/detro/bytes_parser/ci.yml?branch=main&label=CI%20%28main%29&logo=Github&style=flat-square)](https://github.com/detro/bytes_parser/actions/workflows/ci.yml)
+[![Crates.io downloads](https://img.shields.io/crates/d/bytes_parser?logo=rust&style=flat-square)](https://crates.io/crates/bytes_parser)
+[![](https://img.shields.io/crates/v/bytes_parser?label=latest&logo=rust&style=flat-square)](https://crates.io/crates/bytes_parser/versions)
+[![Docs.rs](https://img.shields.io/docsrs/bytes_parser?logo=rust&style=flat-square)](https://docs.rs/bytes_parser/latest/bytes_parser/)
+![Apache 2.0](https://img.shields.io/crates/l/bytes_parser?style=flat-square)
 
 A simple wrapper to parse primitive Rust types from a slice of bytes `[u8]`.
 

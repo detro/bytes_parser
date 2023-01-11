@@ -25,7 +25,7 @@
 //!
 //! ## Examples
 //!
-//! ```no_run
+//! ```compile_fail
 //! use bytes_parser::{BytesParser, ParsingEndian};
 //!
 //! let input: &[u8] = /* a slice of bytes from somewhere */;

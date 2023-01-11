@@ -1,5 +1,11 @@
 # bytes_parser
 
+[![CI](https://img.shields.io/github/actions/workflow/status/detro/bytes_parser/ci.yml?branch=main&label=CI%20%28main%29&logo=Github&style=for-the-badge)](https://github.com/detro/bytes_parser/actions/workflows/ci.yml)
+[![Crates.io downloads](https://img.shields.io/crates/d/bytes_parser?logo=rust&style=for-the-badge)](https://crates.io/crates/bytes_parser)
+[![](https://img.shields.io/crates/v/bytes_parser?label=latest&logo=rust&style=for-the-badge)](https://crates.io/crates/bytes_parser/versions)
+[![Docs.rs](https://img.shields.io/docsrs/bytes_parser?logo=rust&style=for-the-badge)](https://docs.rs/bytes_parser/latest/bytes_parser/)
+![Apache 2.0](https://img.shields.io/crates/l/bytes_parser?style=for-the-badge)
+
 A simple wrapper to parse primitive Rust types from a slice of bytes `[u8]`.
 
 This is the crate for you, if all you need is to parse a **bespoke binary protocol**.
@@ -52,10 +58,6 @@ assert_eq!(str, "Forza Napoli Sempre!");
 * [nom](https://crates.io/crates/nom): steeper learning curve, but more feature complete.
 * [serde](https://crates.io/crates/serde): mostly focused on SERialization/DEserialization of well known formats,
   but it can be setup to handle a slice of bytes.
-
-## TODOs
-
-* Setup GitHub crate publish workflow
 
 ## License
 

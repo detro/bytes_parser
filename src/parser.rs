@@ -52,9 +52,7 @@ macro_rules! build_parse_type_fn {
         pub fn $fn_name(&mut self) -> Result<$parsed_type, BytesParserError> {
             let size = mem::size_of::<$parsed_type>();
             if self.parseable() < size {
-                return Err(BytesParserError::NotEnoughBytesForTypeError(
-                    stringify!($parsed_type).to_string(),
-                ));
+                return Err(BytesParserError::NotEnoughBytesForTypeError(stringify!($parsed_type).to_string()));
             }
 
             let start = self.cursor;
@@ -249,11 +247,7 @@ impl<'a> BytesParser<'a> {
         new_cursor += amount;
 
         if new_cursor >= self.length {
-            Err(BytesParserError::CursorOutOfBoundError(
-                new_cursor as isize,
-                self.length,
-                self.cursor,
-            ))
+            Err(BytesParserError::CursorOutOfBoundError(new_cursor as isize, self.length, self.cursor))
         } else {
             self.cursor = new_cursor;
             Ok(())
@@ -274,11 +268,7 @@ impl<'a> BytesParser<'a> {
         new_cursor -= amount as isize;
 
         if new_cursor < 0 {
-            Err(BytesParserError::CursorOutOfBoundError(
-                new_cursor,
-                self.length,
-                self.cursor,
-            ))
+            Err(BytesParserError::CursorOutOfBoundError(new_cursor, self.length, self.cursor))
         } else {
             self.cursor = new_cursor as usize;
             Ok(())
@@ -296,11 +286,7 @@ impl<'a> BytesParser<'a> {
     /// * `position` - Where to move the cursor at.
     pub fn move_at(&mut self, position: usize) -> Result<(), BytesParserError> {
         if position >= self.length {
-            Err(BytesParserError::CursorOutOfBoundError(
-                position as isize,
-                self.length,
-                self.cursor,
-            ))
+            Err(BytesParserError::CursorOutOfBoundError(position as isize, self.length, self.cursor))
         } else {
             self.cursor = position;
             Ok(())
@@ -589,18 +575,9 @@ mod tests {
         assert_eq!(p.is_empty(), true);
         assert_eq!(p.is_at_start(), p.is_at_end());
 
-        assert_eq!(
-            p.parse_u16().unwrap_err(),
-            BytesParserError::NotEnoughBytesForTypeError("u16".to_string())
-        );
-        assert_eq!(
-            p.parse_char_u32().unwrap_err(),
-            BytesParserError::NotEnoughBytesForTypeError("u32".to_string())
-        );
-        assert_eq!(
-            p.parse_str_utf8(10).unwrap_err(),
-            BytesParserError::NotEnoughBytesForStringError(10)
-        );
+        assert_eq!(p.parse_u16().unwrap_err(), BytesParserError::NotEnoughBytesForTypeError("u16".to_string()));
+        assert_eq!(p.parse_char_u32().unwrap_err(), BytesParserError::NotEnoughBytesForTypeError("u32".to_string()));
+        assert_eq!(p.parse_str_utf8(10).unwrap_err(), BytesParserError::NotEnoughBytesForStringError(10));
     }
 
     #[test]
@@ -610,25 +587,13 @@ mod tests {
         let mut p = BytesParser::from(input);
 
         assert_eq!(p.position(), 0);
-        assert_eq!(
-            p.move_at(3).unwrap_err(),
-            BytesParserError::CursorOutOfBoundError(3, 3, 0)
-        );
-        assert_eq!(
-            p.move_at(33).unwrap_err(),
-            BytesParserError::CursorOutOfBoundError(33, 3, 0)
-        );
+        assert_eq!(p.move_at(3).unwrap_err(), BytesParserError::CursorOutOfBoundError(3, 3, 0));
+        assert_eq!(p.move_at(33).unwrap_err(), BytesParserError::CursorOutOfBoundError(33, 3, 0));
 
         assert_eq!(p.move_forward(1).unwrap(), ());
-        assert_eq!(
-            p.move_forward(4).unwrap_err(),
-            BytesParserError::CursorOutOfBoundError(5, 3, 1)
-        );
+        assert_eq!(p.move_forward(4).unwrap_err(), BytesParserError::CursorOutOfBoundError(5, 3, 1));
 
-        assert_eq!(
-            p.move_backward(2).unwrap_err(),
-            BytesParserError::CursorOutOfBoundError(-1, 3, 1)
-        );
+        assert_eq!(p.move_backward(2).unwrap_err(), BytesParserError::CursorOutOfBoundError(-1, 3, 1));
     }
 
     #[test]
@@ -637,10 +602,7 @@ mod tests {
 
         let mut p = BytesParser::from(input);
 
-        assert_eq!(
-            p.parse_char_u32().unwrap_err(),
-            BytesParserError::InvalidU32ForCharError
-        );
+        assert_eq!(p.parse_char_u32().unwrap_err(), BytesParserError::InvalidU32ForCharError);
     }
 
     #[test]
@@ -650,13 +612,7 @@ mod tests {
         let mut p = BytesParser::from(input);
 
         let err = p.parse_str_utf8(4).unwrap_err();
-        assert_eq!(
-            err.to_string(),
-            "Failed to parse UTF-8 string: invalid utf-8 sequence of 1 bytes from index 1"
-        );
-        assert_eq!(
-            err.source().unwrap().to_string(),
-            "invalid utf-8 sequence of 1 bytes from index 1"
-        );
+        assert_eq!(err.to_string(), "Failed to parse UTF-8 string: invalid utf-8 sequence of 1 bytes from index 1");
+        assert_eq!(err.source().unwrap().to_string(), "invalid utf-8 sequence of 1 bytes from index 1");
     }
 }

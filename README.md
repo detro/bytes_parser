@@ -1,16 +1,20 @@
-# bytes_parser
+# bytes_parser [![CI_s]][CI_l] [![Doc_s]][Doc_l] [![Ver_s]][Ver_l] [![Down_s]][Down_l] ![Lic_s]
 
-<div align="center" style="text-align: center;">
+[CI_s]: https://img.shields.io/github/actions/workflow/status/detro/bytes_parser/ci.yml?branch=main&label=CI%20%28main%29&logo=Github&style=flat-square
+[CI_l]: https://github.com/detro/bytes_parser/actions/workflows/ci.yml
+[Down_s]: https://img.shields.io/crates/d/bytes_parser?logo=rust&style=flat-square
+[Down_l]: https://crates.io/crates/bytes_parser
+[Ver_s]: https://img.shields.io/crates/v/bytes_parser?label=latest&logo=rust&style=flat-square
+[Ver_l]: https://crates.io/crates/bytes_parser/versions
+[Doc_s]: https://img.shields.io/docsrs/bytes_parser?logo=rust&style=flat-square
+[Doc_l]: https://docs.rs/bytes_parser/latest/bytes_parser/
+[Lic_s]: https://img.shields.io/crates/l/bytes_parser?style=flat-square
 
-[![CI](https://img.shields.io/github/actions/workflow/status/detro/bytes_parser/ci.yml?branch=main&label=CI%20%28main%29&logo=Github&style=flat-square)](https://github.com/detro/bytes_parser/actions/workflows/ci.yml)
-[![Crates.io downloads](https://img.shields.io/crates/d/bytes_parser?logo=rust&style=flat-square)](https://crates.io/crates/bytes_parser)
-[![](https://img.shields.io/crates/v/bytes_parser?label=latest&logo=rust&style=flat-square)](https://crates.io/crates/bytes_parser/versions)
-[![Docs.rs](https://img.shields.io/docsrs/bytes_parser?logo=rust&style=flat-square)](https://docs.rs/bytes_parser/latest/bytes_parser/)
-![Apache 2.0](https://img.shields.io/crates/l/bytes_parser?style=flat-square)
+***A simple wrapper to parse primitive Rust types from a slice of bytes `[u8]`***
 
-</div>
+---
 
-A simple wrapper to parse primitive Rust types from a slice of bytes `[u8]`.
+## What is it for?
 
 This is the crate for you, if all you need is to parse a **bespoke binary protocol**.
 You provide a reference slice of bytes, and assuming you know what those bytes represent,

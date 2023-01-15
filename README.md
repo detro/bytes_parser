@@ -1,14 +1,14 @@
 # bytes_parser [![CI_s]][CI_l] [![Doc_s]][Doc_l] [![Ver_s]][Ver_l] [![Down_s]][Down_l] ![Lic_s]
 
-[CI_s]: https://img.shields.io/github/actions/workflow/status/detro/bytes_parser/ci.yml?branch=main&label=CI%20%28main%29&logo=Github&style=flat-square
+[CI_s]: https://img.shields.io/github/actions/workflow/status/detro/bytes_parser/ci.yml?branch=main&label=CI&logo=Github&style=flat-square
 [CI_l]: https://github.com/detro/bytes_parser/actions/workflows/ci.yml
-[Down_s]: https://img.shields.io/crates/d/bytes_parser?logo=rust&style=flat-square
+[Down_s]: https://img.shields.io/crates/d/bytes_parser?logo=rust&style=flat-square&label=DOWN
 [Down_l]: https://crates.io/crates/bytes_parser
-[Ver_s]: https://img.shields.io/crates/v/bytes_parser?label=latest&logo=rust&style=flat-square
+[Ver_s]: https://img.shields.io/crates/v/bytes_parser?logo=rust&style=flat-square&label=VER
 [Ver_l]: https://crates.io/crates/bytes_parser/versions
-[Doc_s]: https://img.shields.io/docsrs/bytes_parser?logo=rust&style=flat-square
+[Doc_s]: https://img.shields.io/docsrs/bytes_parser?logo=rust&style=flat-square&label=DOC
 [Doc_l]: https://docs.rs/bytes_parser/latest/bytes_parser/
-[Lic_s]: https://img.shields.io/crates/l/bytes_parser?style=flat-square
+[Lic_s]: https://img.shields.io/crates/l/bytes_parser?style=flat-square&label=L
 
 ***A simple wrapper to parse primitive Rust types from a slice of bytes `[u8]`***
 
